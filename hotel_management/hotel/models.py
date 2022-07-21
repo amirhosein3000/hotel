@@ -1,6 +1,7 @@
 from pyexpat import model
 from django.db import models
 from django.conf import settings
+from django.http import HttpResponseNotAllowed
 # Create your models here.
 
 class Room(models.Model):
@@ -26,3 +27,4 @@ class Booking(models.Model):
 
     def __str__(self):
         return f'{self.user} has booked {self.room} from {self.check_in} till {self.check_out}'
+
