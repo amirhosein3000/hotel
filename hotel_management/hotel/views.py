@@ -3,16 +3,37 @@ from django.views.generic import ListView, FormView, View
 from .models import Room, Booking
 from .forms import AvailabilityForm
 from hotel.booking_functions.availability import check_availability
-
+from django.urls import reverse
 # Create your views here.
 
 
-class RoomListView(ListView):
-    model = Room
+def RoomListView(request):
+
+    room= Room.objects.all()[0]
+    room_categories = dict(room.ROOM_CATEGORIES)
+
+    room_values = room_categories.values()
+    room_list = []
+    for room_category in room_categories:
+        room = room_categories.get(room_category)
+        room_url = reverse('hotel:RoomDetailView', kwargs={'category': room_category})
+        room_list.append((room, room_url))
+    context = {
+        "room_list": room_list , 
+    }
+    return render(request, 'room_list_view.html', context)
 
 
 class BookingList(ListView):
     model = Booking
+    def get_queryset(self, *argss, **kwargs):
+        if self.request.user.is_staff:
+            booking_list = Booking.objects.all()
+            return booking_list
+        else:
+            booking_list = Booking.objects.filter(user=self.request.user)
+            return booking_list
+             
 
 
 class RoomDetailView(View):
